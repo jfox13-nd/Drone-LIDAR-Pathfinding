@@ -2,11 +2,14 @@
 
 import math
 import pprint
+import tkinter as tk
 
 HYPOTENUSE = 1000
 CURRENT_X = 0.3
 CURRENT_Y = 0.3
 COLLISIONS = {}
+WIDTH = 800
+HEIGHT = 800
 
 BOT_RADIUS = 1.5
 GOALS = []
@@ -74,7 +77,25 @@ def orientation_iterator():
             COLLISIONS[degree] = collision(CURRENT_X, CURRENT_Y, goal_x, goal_y)
 
 
+def collision_plotter(canvas):
+    global COLLISIONS
+    """
+    iterates through all the collisions in the dictionary and plots them on the page
+    """
+    radius = 10
+    for key in COLLISIONS.keys():
+        collision_x, collision_y = COLLISIONS[key]
+        canvas.create_rectangle(collision_x - radius * 0.5, collision_y + radius * 0.5, collision_x + 0.5 * radius,
+                                collision_y - 0.5 * radius, fill="red")
+
+
 if __name__ == "__main__":
+    root = tk.Tk()
+    canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT)
+    canvas.pack()
+
     add_obstacle(1, 1, 1)
     orientation_iterator()
+    collision_plotter(canvas)
     pprint.pprint(COLLISIONS)
+    root.mainloop()
