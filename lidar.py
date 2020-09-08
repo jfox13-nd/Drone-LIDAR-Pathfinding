@@ -67,7 +67,7 @@ def orientation_iterator():
     """
     iterates through degrees 0-360 and finds collisions with objects
     """
-    for degree in range(0, 360):
+    for degree in range(0, 360, 3):
         goal_x, goal_y = calculate_goals(degree)
         print("goal x: ", goal_x, " goal_y: ", goal_y)
         if collision(CURRENT_X, CURRENT_Y, goal_x, goal_y):
