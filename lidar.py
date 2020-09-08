@@ -6,8 +6,8 @@ from shapely.geometry import LineString
 from shapely.geometry import Point
 
 HYPOTENUSE = 1000
-CURRENT_X = 0.3
-CURRENT_Y = 0.3
+CURRENT_X =  400 # 0.3
+CURRENT_Y = 790 # 0.3
 COLLISIONS = {}
 
 BOT_RADIUS = 1.5
@@ -28,8 +28,9 @@ def collision(x: float, y: float, goal_x: float, goal_y: float):
     for obstacle in OBSTACLES:
         obstacle_center = Point(obstacle[0],obstacle[1])
         obstacle_circle = obstacle_center.buffer(obstacle[2]).boundary
+        #print(obstacle_circle)
         inter = obstacle_circle.intersection(path)
-        print(type(inter))
+        #print(type(inter))
         #print(inter.geoms[0])
     collide = detect_blocking_circle(x, y, central_m, central_b)
     if collide:
@@ -105,16 +106,19 @@ def calculate_goals(theta):
     return HYPOTENUSE * math.sin(math.radians(theta)), HYPOTENUSE * math.cos(math.radians(theta))
 
 
-def orientation_iterator():
+def orientation_iterator(x=CURRENT_X,y=CURRENT_Y):
     global COLLISIONS
     """
     iterates through degrees 0-360 and finds collisions with objects
     """
+    print(x,y)
     for degree in range(0, 360):
         goal_x, goal_y = calculate_goals(degree)
-        print("goal x: ", goal_x, " goal_y: ", goal_y)
-        if collision(CURRENT_X, CURRENT_Y, goal_x, goal_y):
-            COLLISIONS[degree] = collision(CURRENT_X, CURRENT_Y, goal_x, goal_y)
+        #print("goal x: ", goal_x, " goal_y: ", goal_y)
+        #if collision(CURRENT_X, CURRENT_Y, goal_x, goal_y):
+        #    COLLISIONS[degree] = collision(CURRENT_X, CURRENT_Y, goal_x, goal_y)
+        if collision(x, y, goal_x, goal_y):
+            COLLISIONS[degree] = collision(x, y, goal_x, goal_y)
 
 
 if __name__ == "__main__":

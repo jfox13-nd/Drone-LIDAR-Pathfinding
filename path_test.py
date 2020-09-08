@@ -48,29 +48,51 @@ bot = canvas.create_oval(bot_x, bot_y, bot_x + 3, bot_y + 3, fill="red")
 goal_x = 700
 goal_y = 100
 goal = canvas.create_rectangle(goal_x, goal_y, goal_x + 5, goal_y + 5, fill="green")
-
+'''
 orientation_iterator()
 for p in COLLISIONS:
     x_collide = COLLISIONS[p][0]
     y_collide = COLLISIONS[p][1]
 
     canvas.create_rectangle(x_collide-5,y_collide-5,x_collide+5,y_collide+5,fill="red")
-canvas.create_rectangle(300,300,300+50,300+50,fill="red")
+
 canvas.pack()
+'''
+
+def lidar_scan():
+    orientation_iterator(CURRENT_X,CURRENT_Y)
+    for p in COLLISIONS:
+        x_collide = COLLISIONS[p][0]
+        y_collide = COLLISIONS[p][1]
+
+        canvas.create_rectangle(x_collide,y_collide,x_collide,y_collide,fill="red")
+        #print("seen")
+    canvas.pack()
+    #print("HELLO")
+    
 
 #print("SEE ME")
 #print(COLLISIONS)
+lidar_scan()
 
 def move(event):
+    global CURRENT_X
+    global CURRENT_Y
     global x1, y1
     if event.char == "a":
         canvas.move(bot, -5, 0)
+        CURRENT_X -= 5
     elif event.char == "d":
         canvas.move(bot, 5, 0)
+        CURRENT_X += 5
     elif event.char == "w":
         canvas.move(bot, 0, -5)
+        CURRENT_Y -= 5
     elif event.char == "s":
         canvas.move(bot, 0, 5)
+        CURRENT_Y += 5
+    #print(CURRENT_X,CURRENT_Y)
+    lidar_scan()
 
 root.bind("<Key>", move)
 root.mainloop()
