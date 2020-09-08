@@ -12,10 +12,17 @@ OBSTACLES = []
 
 def add_goal(x: float,y: float) -> None:
     ''' Add new subgoal '''
+    global GOALS
     GOALS.insert(0,(x,y))
+
+def add_obstacle(x: float,y: float,r:float) -> None:
+    ''' Add new subgoal '''
+    global OBSTACLES
+    OBSTACLES.insert(0,(x,y,r))
 
 def pathfinding_complete() -> None:
     ''' returns True if pathfinding complete '''
+    global GOALS
     if GOALS:
         return False
     else:
@@ -23,6 +30,7 @@ def pathfinding_complete() -> None:
     
 def find_subgoal(x: float, y: float):
     ''' determines if a subgoal is needed, adds subgoal as necessary '''
+    global GOALS
     if not GOALS:
         return
     goalx = GOALS[0][0]
@@ -59,6 +67,7 @@ def find_subgoal(x: float, y: float):
 
 def detect_blocking_circle(x:float, y: float, m: float, b: float):
     ''' Checks against every obstacle to determine if there will be a collison '''
+    global OBSTACLES
     for obstacle in OBSTACLES:
         # calculate the y coordinate along the line at x = center of obstacle
         closest_y = m * obstacle[0] + b
