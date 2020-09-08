@@ -2,6 +2,8 @@
 
 import math
 import pprint
+from shapely.geometry import LineString
+from shapely.geometry import Point
 
 HYPOTENUSE = 1000
 CURRENT_X = 0.3
@@ -20,9 +22,39 @@ def collision(x: float, y: float, goal_x: float, goal_y: float):
     Currently does not take into account drone hitbox
     Returns tuple with collison points or None if no collision
     '''
+    path = LineString([(x,y),(goal_x,goal_y)])
     central_m = slope_calculator(x, y, goal_x, goal_y)
     central_b = b_calculator(x, y, central_m)
-    return detect_blocking_circle(x, y, central_m, central_b)
+    for obstacle in OBSTACLES:
+        obstacle_center = Point(obstacle[0],obstacle[1])
+        obstacle_circle = obstacle_center.buffer(obstacle[2]).boundary
+        inter = obstacle_circle.intersection(path)
+        print(type(inter))
+        #print(inter.geoms[0])
+    collide = detect_blocking_circle(x, y, central_m, central_b)
+    if collide:
+        return collide
+    return boundary_hit(x,y,goal_x,goal_y)
+    
+def boundary_hit(x: float, y: float, goal_x: float, goal_y: float):
+    #print("HELLO")
+    #print(x,y,goal_x,goal_y)
+    path = LineString([(x,y),(goal_x,goal_y)])
+    #print("SEE ME1")
+    upper_wall = LineString([(0,800),(800,800)])
+    right_wall = LineString([(800,800),(800,0)])
+    left_wall = LineString([(0,0),(0,800)])
+    bottom_wall = LineString([(0,0),(800,0)])
+    #print("SEE ME1")
+    #print(left_wall)
+    #print("SEE ME2")
+    #print(left_wall.intersection(upper_wall).geometry)
+    #print("TEST")
+    for wall in [ upper_wall, right_wall, left_wall, bottom_wall]:
+        inter = path.intersection(wall)
+        #print("HELLO")
+        if inter:
+            return (inter.x, inter.y)
 
 
 def detect_blocking_circle(x: float, y: float, m: float, b: float):
@@ -34,6 +66,17 @@ def detect_blocking_circle(x: float, y: float, m: float, b: float):
         # if that y coordinate is within the radius of the obstacle then return collision point
         if abs(closest_y - obstacle[1]) < obstacle[2]:
             return (obstacle[0], closest_y)
+        '''
+        A = -m
+        B = 1
+        C = -b
+        #x_closest = ( B * (B*obstacle[0] - A*obstacle[1]) - A * C) / (A ** 2 + B ** 2)
+        #y_closest = ( A * (-1*B*obstacle[0] + A*obstacle[1]) - B * C) / (A ** 2 + B ** 2)
+        dist_to_center = (abs(A * obstacle[0] + B * obstacle[1] + C)) / math.sqrt(A * A + B * B)
+        closest_y = m * obstacle[0] + b
+        if dist_to_center < obstacle[2] + BOT_RADIUS:
+            first_collision = (obstacle[0],closest_y)
+        '''
     return None
 
 
@@ -67,7 +110,7 @@ def orientation_iterator():
     """
     iterates through degrees 0-360 and finds collisions with objects
     """
-    for degree in range(0, 360, 3):
+    for degree in range(0, 360):
         goal_x, goal_y = calculate_goals(degree)
         print("goal x: ", goal_x, " goal_y: ", goal_y)
         if collision(CURRENT_X, CURRENT_Y, goal_x, goal_y):
