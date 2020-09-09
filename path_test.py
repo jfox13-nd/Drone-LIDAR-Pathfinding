@@ -69,7 +69,7 @@ def lidar_scan():
     canvas.pack()
     
 
-def moveto(x,y):
+def moveto(x,y, enable_lidar=True):
     global CURRENT_X
     global CURRENT_Y
     ydif = y - CURRENT_Y
@@ -82,7 +82,8 @@ def moveto(x,y):
     canvas.move(bot, xdif, ydif)
     CURRENT_X += xdif
     CURRENT_Y += ydif
-    lidar_scan()
+    if enable_lidar:
+        lidar_scan()
     canvas.update()
 
 def create_spot(x,y):
@@ -93,6 +94,7 @@ while True:
     min_distance = 100000000
     closest_x = 0
     closest_y = 0
+    curr_point = Point(CURRENT_X,CURRENT_Y)
     for i in BEST_POINTS:
         if BEST_POINTS[i][2] < min_distance:
             closest_x = BEST_POINTS[i][0]
@@ -100,6 +102,22 @@ while True:
             min_distance = BEST_POINTS[i][2]
     create_spot(CURRENT_X,CURRENT_Y)
     
+    for obstacle in OBSTACLES:
+        obstacle_point = Point(obstacle[0],obstacle[1])
+        if obstacle_point.distance(curr_point) < obstacle[2] + 5:
+            ydif = obstacle[1] - CURRENT_Y
+            xdif = obstacle[0] - CURRENT_X
+            magnitude = math.sqrt( ydif ** 2 + xdif ** 2)
+            ydif /= magnitude
+            xdif /= magnitude
+            xdif *= 2
+            ydif *= 2
+            CURRENT_X -= xdif
+            CURRENT_Y -= ydif
+            canvas.move(bot, -1 * xdif, -1 * ydif)
+            canvas.update()
+            #moveto(CURRENT_X + xdif, CURRENT_Y + ydif, enable_lidar=False)
+        
     moveto(closest_x,closest_y)
     time.sleep(0.01)
 
