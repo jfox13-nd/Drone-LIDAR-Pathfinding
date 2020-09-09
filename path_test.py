@@ -27,21 +27,26 @@ oval2 = canvas.create_oval(x2-D1/2, y2-D1/2, x2 + D1/2, y2 + D1/2, fill="yellow"
 x3 = 450
 y3 = 500
 oval3 = canvas.create_oval(x3-D2/2, y3-D2/2, x3 + D2/2, y3 + D2/2, fill="yellow")
-x4 = 600
+x4 = 640 # 600
 y4 = 250
 oval4 = canvas.create_oval(x4-D2/2, y4-D2/2, x4 + D2/2, y4 + D2/2, fill="yellow")
 x5 = 705
 y5 = 320
 oval5 = canvas.create_oval(x5-D3/2, y5-D3/2, x5 + D3/2, y5 + D3/2, fill="yellow")
 
-add_obstacle(680,680,D1/2)
-add_obstacle(620,660,D1/2)
-add_obstacle(450,500,D2/2)
-add_obstacle(600,250,D2/2)
-add_obstacle(705,320,D3/2)
+x6 = 600
+y6 = 660
+oval6 = canvas.create_oval(x6-D1/2, y6-D1/2, x6 + D1/2, y6 + D1/2, fill="yellow")
+
+add_obstacle(x1,y1,D1/2)
+add_obstacle(x2,y2,D1/2)
+add_obstacle(x3,y3,D2/2)
+add_obstacle(x4,y4,D2/2)
+add_obstacle(x5,y5,D3/2)
+add_obstacle(x6,y6,D1/2)
 
 # Placing the bot on the canvas
-bot_x = 400
+bot_x = 600
 bot_y = 790
 bot = canvas.create_oval(bot_x, bot_y, bot_x + 3, bot_y + 3, fill="red")
 
@@ -63,7 +68,7 @@ canvas.pack()
 '''
 
 def lidar_scan():
-    orientation_iterator(CURRENT_X,CURRENT_Y)
+    orientation_iterator(CURRENT_X,CURRENT_Y, goal_x, goal_y)
     for p in COLLISIONS:
         x_collide = COLLISIONS[p][0]
         y_collide = COLLISIONS[p][1]
@@ -120,7 +125,15 @@ def move(event):
     lidar_scan()
 
 while True:
-    moveto(goal_x,goal_y)
+    min_distance = 100000000
+    closest_x = 0
+    closest_y = 0
+    for i in BEST_POINTS:
+        if BEST_POINTS[i][2] < min_distance:
+            closest_x = BEST_POINTS[i][0]
+            closest_y = BEST_POINTS[i][1]
+            min_distance = BEST_POINTS[i][2]
+    moveto(closest_x,closest_y)
     time.sleep(0.01)
 
 

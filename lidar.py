@@ -4,9 +4,10 @@ import math
 import pprint
 from shapely.geometry import LineString
 from shapely.geometry import Point
+from shapely.ops import nearest_points
 
 HYPOTENUSE = 1000
-CURRENT_X =  400 # 0.3
+CURRENT_X =  600 # 0.3
 CURRENT_Y = 790 # 0.3
 COLLISIONS = {}
 BEST_POINTS = {}
@@ -113,20 +114,33 @@ def distance_between_points(x1: float,y1: float,x2: float,y2: float) -> float:
     ''' Returns distance between two points '''
     return math.sqrt( (x1-x2) ** 2 + (y1-y2) ** 2)
 
-def orientation_iterator(x=CURRENT_X,y=CURRENT_Y):
+def orientation_iterator(x,y,final_goal_x, final_goal_y):
     global COLLISIONS
     """
     iterates through degrees 0-360 and finds collisions with objects
     """
     print(x,y)
+    start_point = Point(x,y)
+    final_goal_point = Point(final_goal_x,final_goal_y)
 
     for degree in range(0, 360):
         goal_x, goal_y = calculate_goals(degree)
+        path = LineString([(x,y),(goal_x,goal_y)])
+        np = nearest_points(path, final_goal_point)[0]
+        BEST_POINTS[degree] = (np.x,np.y, final_goal_point.distance(np))
         #print("goal x: ", goal_x, " goal_y: ", goal_y)
         #if collision(CURRENT_X, CURRENT_Y, goal_x, goal_y):
         #    COLLISIONS[degree] = collision(CURRENT_X, CURRENT_Y, goal_x, goal_y)
         if collision(x, y, goal_x, goal_y):
             COLLISIONS[degree] = collision(x, y, goal_x, goal_y)
+        else:
+            #print("SEE ME")
+            continue
+        
+
+        collision_point = Point(COLLISIONS[degree][0],COLLISIONS[degree][1])
+        if start_point.distance(collision_point) < start_point.distance(np):
+            BEST_POINTS[degree] = (collision_point.x,collision_point.y, final_goal_point.distance(collision_point))
 
 
 if __name__ == "__main__":
