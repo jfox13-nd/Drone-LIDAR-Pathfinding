@@ -15,8 +15,6 @@ canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT)
 
 canvas.pack()
 
-text = canvas.create_text(400, 10, text="Keys to move = a,d,w,s")
-
 # Placing obstacles on the canvas
 x1 = 680
 y1 = 680
