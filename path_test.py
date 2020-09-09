@@ -35,7 +35,7 @@ oval5 = canvas.create_oval(x5-D3/2, y5-D3/2, x5 + D3/2, y5 + D3/2, fill="yellow"
 
 add_obstacle(680,680,D1/2)
 add_obstacle(620,660,D1/2)
-add_obstacle(450,550,D2/2)
+add_obstacle(450,500,D2/2)
 add_obstacle(600,250,D2/2)
 add_obstacle(705,320,D3/2)
 
@@ -74,6 +74,12 @@ def lidar_scan():
 #print("SEE ME")
 #print(COLLISIONS)
 lidar_scan()
+
+def move2():
+    global CURRENT_X
+    global CURRENT_Y
+    global x1, y1
+    lidar_scan()
 
 def move(event):
     global CURRENT_X
