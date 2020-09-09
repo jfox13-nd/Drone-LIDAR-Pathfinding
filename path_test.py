@@ -2,6 +2,7 @@
 import tkinter as tk
 from lidar import *
 import time
+from shapely.geometry import Point
 
 root = tk.Tk()
 
@@ -10,6 +11,7 @@ HEIGHT=800
 D1 = 20
 D2 = 30
 D3 = 40
+point_drop_counter = 3
 
 canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT)
 
@@ -49,7 +51,7 @@ add_obstacle(x7,y7,D3/2)
 # Placing the bot on the canvas
 bot_x = 600
 bot_y = 790
-bot = canvas.create_oval(bot_x, bot_y, bot_x + 3, bot_y + 3, fill="red")
+bot = canvas.create_oval(bot_x-3, bot_y-3, bot_x + 3, bot_y + 3, fill="red")
 
 # Placing the goal on the canvas
 goal_x = 700
@@ -83,6 +85,8 @@ def moveto(x,y):
     lidar_scan()
     canvas.update()
 
+def create_spot(x,y):
+    canvas.create_rectangle(x, y, x, y, fill="green")
 
 lidar_scan()
 while True:
@@ -94,6 +98,8 @@ while True:
             closest_x = BEST_POINTS[i][0]
             closest_y = BEST_POINTS[i][1]
             min_distance = BEST_POINTS[i][2]
+    create_spot(CURRENT_X,CURRENT_Y)
+    
     moveto(closest_x,closest_y)
     time.sleep(0.01)
 
