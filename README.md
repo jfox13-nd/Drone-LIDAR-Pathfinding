@@ -8,6 +8,8 @@ https://fei.edu.br/rcs/2014/RegularPapers/robocupsymposium2014_submission_55.pdf
 ##Running Instructions
 `$ pip install -r requirements.txt`
 `$ python3 path_test.py`
+OR
+`./path_test.py`
 
 ##Write-up
 Jack Fox, Jack Morgan, Sean Crotty <br>
