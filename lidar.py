@@ -25,35 +25,30 @@ def collision(x: float, y: float, goal_x: float, goal_y: float):
     Returns tuple with collison points or None if no collision
     '''
     path = LineString([(x,y),(goal_x,goal_y)])
-    central_m = slope_calculator(x, y, goal_x, goal_y)
-    central_b = b_calculator(x, y, central_m)
+    start_point = Point(x,y)
     for obstacle in OBSTACLES:
         obstacle_center = Point(obstacle[0],obstacle[1])
         obstacle_circle = obstacle_center.buffer(obstacle[2]).boundary
-        #print(obstacle_circle)
         inter = obstacle_circle.intersection(path)
         if type(inter) != LineString:
-            #print(inter.centroid)
-            return (inter.geoms[0].x, inter.geoms[0].y)
+            p1 = Point(inter.geoms[0].x, inter.geoms[0].y)
+            p2 = Point(inter.geoms[-1].x, inter.geoms[-1].y)
+            if p2.distance(start_point) < p1.distance(start_point):
+                return (p2.x, p2.y)
+            return (p1.x,p1.y)
     return boundary_hit(x,y,goal_x,goal_y)
     
+
 def boundary_hit(x: float, y: float, goal_x: float, goal_y: float):
-    #print("HELLO")
-    #print(x,y,goal_x,goal_y)
+    ''' returns collision data along the wall of the simulation '''
     path = LineString([(x,y),(goal_x,goal_y)])
-    #print("SEE ME1")
     upper_wall = LineString([(0,800),(800,800)])
     right_wall = LineString([(800,800),(800,0)])
     left_wall = LineString([(0,0),(0,800)])
     bottom_wall = LineString([(0,0),(800,0)])
-    #print("SEE ME1")
-    #print(left_wall)
-    #print("SEE ME2")
-    #print(left_wall.intersection(upper_wall).geometry)
-    #print("TEST")
+
     for wall in [ upper_wall, right_wall, left_wall, bottom_wall]:
         inter = path.intersection(wall)
-        #print("HELLO")
         if inter:
             return (inter.x, inter.y)
 
@@ -81,20 +76,11 @@ def detect_blocking_circle(x: float, y: float, m: float, b: float):
     return None
 
 
-def slope_calculator(x: float, y: float, goalx: float, goaly: float) -> float:
-    ''' Find the slope of the line y = mx + b '''
-    return (goaly - y) / (goalx - x)
-
-
-def b_calculator(x: float, y: float, m: float) -> float:
-    ''' calculate b from y = mx + b '''
-    return y - m * x
-
-
 def add_obstacle(x: float, y: float, r: float) -> None:
     """ Add new obstacle """
     global OBSTACLES
     OBSTACLES.insert(0, (x, y, r))
+
 
 def add_goal(x: float,y: float) -> None:
     ''' Add new subgoal '''
@@ -110,9 +96,6 @@ def calculate_goals(theta):
     """
     return HYPOTENUSE * math.sin(math.radians(theta)), HYPOTENUSE * math.cos(math.radians(theta))
 
-def distance_between_points(x1: float,y1: float,x2: float,y2: float) -> float:
-    ''' Returns distance between two points '''
-    return math.sqrt( (x1-x2) ** 2 + (y1-y2) ** 2)
 
 def orientation_iterator(x,y,final_goal_x, final_goal_y):
     global COLLISIONS
@@ -128,16 +111,12 @@ def orientation_iterator(x,y,final_goal_x, final_goal_y):
         path = LineString([(x,y),(goal_x,goal_y)])
         np = nearest_points(path, final_goal_point)[0]
         BEST_POINTS[degree] = (np.x,np.y, final_goal_point.distance(np))
-        #print("goal x: ", goal_x, " goal_y: ", goal_y)
-        #if collision(CURRENT_X, CURRENT_Y, goal_x, goal_y):
-        #    COLLISIONS[degree] = collision(CURRENT_X, CURRENT_Y, goal_x, goal_y)
+
         if collision(x, y, goal_x, goal_y):
             COLLISIONS[degree] = collision(x, y, goal_x, goal_y)
         else:
-            #print("SEE ME")
             continue
         
-
         collision_point = Point(COLLISIONS[degree][0],COLLISIONS[degree][1])
         if start_point.distance(collision_point) < start_point.distance(np):
             BEST_POINTS[degree] = (collision_point.x,collision_point.y, final_goal_point.distance(collision_point))
