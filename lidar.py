@@ -9,6 +9,7 @@ HYPOTENUSE = 1000
 CURRENT_X =  400 # 0.3
 CURRENT_Y = 790 # 0.3
 COLLISIONS = {}
+BEST_POINTS = {}
 
 BOT_RADIUS = 1.5
 GOALS = []
@@ -31,7 +32,7 @@ def collision(x: float, y: float, goal_x: float, goal_y: float):
         #print(obstacle_circle)
         inter = obstacle_circle.intersection(path)
         if type(inter) != LineString:
-            print(inter.centroid)
+            #print(inter.centroid)
             return (inter.geoms[0].x, inter.geoms[0].y)
     return boundary_hit(x,y,goal_x,goal_y)
     
@@ -90,9 +91,14 @@ def b_calculator(x: float, y: float, m: float) -> float:
 
 
 def add_obstacle(x: float, y: float, r: float) -> None:
-    """ Add new subgoal """
+    """ Add new obstacle """
     global OBSTACLES
     OBSTACLES.insert(0, (x, y, r))
+
+def add_goal(x: float,y: float) -> None:
+    ''' Add new subgoal '''
+    global GOALS
+    GOALS.insert(0,(x,y))
 
 
 def calculate_goals(theta):
@@ -103,6 +109,9 @@ def calculate_goals(theta):
     """
     return HYPOTENUSE * math.sin(math.radians(theta)), HYPOTENUSE * math.cos(math.radians(theta))
 
+def distance_between_points(x1: float,y1: float,x2: float,y2: float) -> float:
+    ''' Returns distance between two points '''
+    return math.sqrt( (x1-x2) ** 2 + (y1-y2) ** 2)
 
 def orientation_iterator(x=CURRENT_X,y=CURRENT_Y):
     global COLLISIONS
@@ -110,6 +119,7 @@ def orientation_iterator(x=CURRENT_X,y=CURRENT_Y):
     iterates through degrees 0-360 and finds collisions with objects
     """
     print(x,y)
+
     for degree in range(0, 360):
         goal_x, goal_y = calculate_goals(degree)
         #print("goal x: ", goal_x, " goal_y: ", goal_y)
