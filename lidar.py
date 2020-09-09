@@ -32,14 +32,7 @@ def collision(x: float, y: float, goal_x: float, goal_y: float):
         inter = obstacle_circle.intersection(path)
         if type(inter) != LineString:
             print(inter.centroid)
-            return (inter.centroid.x, inter.centroid.y)
-        #print(type(inter))
-        #print(inter.coords)
-        #print(type(inter))
-        #print(inter.geoms[0])
-    collide = detect_blocking_circle(x, y, central_m, central_b)
-    if collide:
-        return collide
+            return (inter.geoms[0].x, inter.geoms[0].y)
     return boundary_hit(x,y,goal_x,goal_y)
     
 def boundary_hit(x: float, y: float, goal_x: float, goal_y: float):
