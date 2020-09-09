@@ -30,10 +30,7 @@ def collision(x: float, y: float, goal_x: float, goal_y: float):
         obstacle_circle = obstacle_center.buffer(obstacle[2]).boundary
         #print(obstacle_circle)
         inter = obstacle_circle.intersection(path)
-        if type(inter) == LineString:
-            if inter.coords:
-                print(inter.coords)
-        else:
+        if type(inter) != LineString:
             print(inter.centroid)
             return (inter.centroid.x, inter.centroid.y)
         #print(type(inter))
